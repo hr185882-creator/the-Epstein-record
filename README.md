@@ -1,12 +1,26 @@
 # The Epstein Record — Sanitized Public Reference
 
 [![Quality checks](https://github.com/hr185882-creator/the-Epstein-record/actions/workflows/quality.yml/badge.svg)](https://github.com/hr185882-creator/the-Epstein-record/actions/workflows/quality.yml)
+[![Live product smoke test](https://github.com/hr185882-creator/the-Epstein-record/actions/workflows/live-smoke.yml/badge.svg)](https://github.com/hr185882-creator/the-Epstein-record/actions/workflows/live-smoke.yml)
 
 A public-safe reference architecture for a source-first research product that distinguishes what records establish from what they merely suggest, repeat, or fail to prove.
 
 - Live product: https://the-epstein-record.vercel.app/
+- Version: `1.1.0`
 - Portfolio: https://github.com/hr185882-creator
 - Creator: Hasan Raza Kazmi
+
+## Verified package scope
+
+- 1 formal Draft 2020-12 JSON Schema
+- 7 controlled evidence states
+- 2 fictional claim-ledger records
+- 2 fictional source records
+- 1 executable domain-validation suite
+- 1 scheduled production smoke test
+- 2 automated GitHub workflows
+
+These counts describe the public-safe reference package, not the production corpus.
 
 ## Why this repository exists
 
@@ -18,7 +32,7 @@ This is a reference implementation and documentation package, not a byte-for-byt
 
 - Claim-level evidence classification
 - Source provenance and source-chain separation
-- Association-versus-culpability safeguards
+- Association-versus-culability safeguards
 - Adjudicated, alleged, disputed, unresolved, and not-established states
 - Privacy and public-interest review boundaries
 - Corrections, retractions, and revision history
@@ -27,13 +41,17 @@ This is a reference implementation and documentation package, not a byte-for-byt
 
 ## Repository map
 
+- `schema/claim-ledger.schema.json` — machine-enforced public schema
+- `tests/validate_repository.py` — domain and publication-control tests
 - `docs/ARCHITECTURE.md` — system boundaries, data flow, and release gates
 - `docs/PRIVACY_AND_CORRECTIONS.md` — privacy, corrections, and contested-claim controls
 - `data/example-claim-ledger.json` — fictional public-safe schema examples
-- `.github/workflows/quality.yml` — deterministic content validation
+- `.github/workflows/quality.yml` — schema, domain, and link validation
+- `.github/workflows/live-smoke.yml` — scheduled production-endpoint verification
 - `.github/workflows/dependency-review.yml` — high-severity dependency review on pull requests
 - `SECURITY.md` — responsible disclosure and sensitive-data handling
 - `CHANGELOG.md` — material release history
+- `RELEASE_NOTES.md` — release-ready version notes
 - `CITATION.cff` — citation metadata
 
 ## Evidence states
