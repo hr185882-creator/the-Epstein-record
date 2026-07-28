@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/hr185882-creator/the-Epstein-record/schema/claim-ledger.schema.json",
+  "title": "The Epstein Record sanitized claim ledger",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "notice", "records"],
+  "properties": {
+    "schema_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "notice": {"type": "string", "minLength": 40},
+    "records": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/record"}
+    }
+  },
+  "$defs": {
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_id", "title", "issuer", "date", "accessed", "type", "independent"],
+      "properties": {
+        "source_id": {"type": "string", "minLength": 3},
+        "title": {"type": "string", "minLength": 3},
+        "issuer": {"type": "string", "minLength": 2},
+        "date": {"type": "string", "format": "date"},
+        "accessed": {"type": "string", "format": "date"},
+        "type": {"type": "string", "minLength": 3},
+        "independent": {"type": "boolean"}
+      }
+    },
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claim_id", "subject", "claim", "state", "evidence_ceiling", "sources", "contradictions_or_responses", "privacy_review", "revision_conditions", "review"],
+      "properties": {
+        "claim_id": {"type": "string", "pattern": "^TER-[A-Z0-9-]+$"},
+        "subject": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["display_name", "entity_type"],
+          "properties": {
+            "display_name": {"type": "string", "minLength": 3},
+            "entity_type": {"type": "string", "enum": ["fictional_person", "fictional_organization", "fictional_institution"]}
+          }
+        },
+        "claim": {"type": "string", "minLength": 15},
+        "state": {"type": "string", "enum": ["adjudicated", "verified_record", "supported_reporting", "alleged", "disputed", "unresolved", "not_established"]},
+        "evidence_ceiling": {"type": "string", "minLength": 20},
+        "sources": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/source"}},
+        "contradictions_or_responses": {"type": "array", "items": {"type": "object"}},
+        "privacy_review": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "reason"],
+          "properties": {
+            "status": {"type": "string", "enum": ["passed", "withhold_identity", "restricted", "rejected"]},
+            "reason": {"type": "string", "minLength": 15}
+          }
+        },
+        "revision_conditions": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 10}},
+        "review": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["review_status", "reviewed_at", "reviewer"],
+          "properties": {
+            "review_status": {"type": "string", "enum": ["approved_example", "approved", "withheld", "rejected"]},
+            "reviewed_at": {"type": "string", "format": "date"},
+            "reviewer": {"type": "string", "minLength": 3}
+          }
+        }
+      }
+    }
+  }
+}
