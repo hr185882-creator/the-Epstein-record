@@ -5,7 +5,7 @@ type: dataset
 authors:
   - family-names: "Kazmi"
     given-names: "Hasan Raza"
-version: "1.0.0"
+version: "1.1.0"
 date-released: "2026-07-28"
 url: "https://the-epstein-record.vercel.app/"
 repository-code: "https://github.com/hr185882-creator/the-Epstein-record"
