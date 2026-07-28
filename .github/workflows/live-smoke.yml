@@ -1,0 +1,26 @@
+name: Live product smoke test
+
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/live-smoke.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify production endpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          body="$(curl --fail --silent --show-error --location --retry 3 --max-time 30 https://the-epstein-record.vercel.app/)"
+          test -n "$body"
+          grep -qi "The Epstein Record" <<<"$body"
+          echo "Production endpoint returned expected product identity."
