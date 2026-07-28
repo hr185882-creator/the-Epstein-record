@@ -1,0 +1,55 @@
+name: Quality checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate JSON and local Markdown links
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from urllib.parse import unquote, urlsplit
+          import json, re, sys
+
+          root = Path.cwd()
+          errors = []
+          for path in root.rglob('*.json'):
+              try:
+                  json.loads(path.read_text(encoding='utf-8'))
+              except Exception as exc:
+                  errors.append(f'{path}: {exc}')
+
+          pattern = re.compile(r'!?\[[^\]]*\]\(([^)]+)\)')
+          for path in root.rglob('*.md'):
+              for raw in pattern.findall(path.read_text(encoding='utf-8')):
+                  target = raw.strip().split(' "', 1)[0].strip('<>')
+                  if not target or target.startswith(('#', 'http://', 'https://', 'mailto:')):
+                      continue
+                  clean = unquote(urlsplit(target).path)
+                  candidate = (root / clean.lstrip('/')) if clean.startswith('/') else (path.parent / clean)
+                  if not candidate.exists():
+                      errors.append(f'{path}: missing local target {target}')
+
+          if errors:
+              print('\n'.join(errors))
+              sys.exit(1)
+          print('Sanitized repository validation passed.')
+          PY
