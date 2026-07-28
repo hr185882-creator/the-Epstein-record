@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "Please cite this sanitized public reference by title, version, author, and access date."
+title: "The Epstein Record — Sanitized Public Reference"
+type: dataset
+authors:
+  - family-names: "Kazmi"
+    given-names: "Hasan Raza"
+version: "1.0.0"
+date-released: "2026-07-28"
+url: "https://the-epstein-record.vercel.app/"
+repository-code: "https://github.com/hr185882-creator/the-Epstein-record"
+keywords:
+  - public records
+  - evidence verification
+  - source provenance
+  - privacy
+  - claim classification
+  - investigative research
