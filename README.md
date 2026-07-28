@@ -32,7 +32,7 @@ This is a reference implementation and documentation package, not a byte-for-byt
 
 - Claim-level evidence classification
 - Source provenance and source-chain separation
-- Association-versus-culability safeguards
+- Association-versus-culpability safeguards
 - Adjudicated, alleged, disputed, unresolved, and not-established states
 - Privacy and public-interest review boundaries
 - Corrections, retractions, and revision history
