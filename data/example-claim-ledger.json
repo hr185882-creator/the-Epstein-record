@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0.0",
+  "notice": "All people, institutions, events, and records in this file are fictional examples created solely to demonstrate data structure. They are not factual allegations.",
+  "records": [
+    {
+      "claim_id": "TER-DEMO-0001",
+      "subject": {"display_name": "Example Public Official", "entity_type": "fictional_person"},
+      "claim": "A contemporaneous public calendar records a scheduled meeting with Example Organization on 2024-01-15.",
+      "state": "verified_record",
+      "evidence_ceiling": "The record establishes a scheduled meeting entry. It does not establish attendance, knowledge, intent, wrongdoing, or the content of any discussion.",
+      "sources": [{"source_id": "SRC-DEMO-001", "title": "Example Public Calendar", "issuer": "Example Records Office", "date": "2024-01-10", "accessed": "2026-07-28", "type": "fictional_primary_record", "independent": true}],
+      "contradictions_or_responses": [],
+      "privacy_review": {"status": "passed", "reason": "Fictional public-official example containing no personal contact or victim information."},
+      "revision_conditions": ["Authenticated evidence that the calendar entry was cancelled or fabricated.", "A controlling official record materially changing the identity, date, or nature of the entry."],
+      "review": {"review_status": "approved_example", "reviewed_at": "2026-07-28", "reviewer": "Hasan Raza Kazmi"}
+    },
+    {
+      "claim_id": "TER-DEMO-0002",
+      "subject": {"display_name": "Example Private Individual", "entity_type": "fictional_person"},
+      "claim": "An unverified online post alleges misconduct by the subject.",
+      "state": "not_established",
+      "evidence_ceiling": "The available material establishes only that an allegation was posted. It does not establish the truth of the allegation.",
+      "sources": [{"source_id": "SRC-DEMO-002", "title": "Example Unverified Post", "issuer": "Unknown", "date": "2025-05-20", "accessed": "2026-07-28", "type": "fictional_unverified_claim", "independent": false}],
+      "contradictions_or_responses": [{"type": "evidentiary_gap", "summary": "No authenticated primary record, reliable independent reporting, legal filing, or corroborating witness record is available."}],
+      "privacy_review": {"status": "withhold_identity", "reason": "Unsupported allegations about a private person should not be amplified or indexed by name."},
+      "revision_conditions": ["Authenticated primary records or reliable independent reporting materially supporting the proposition."],
+      "review": {"review_status": "approved_example", "reviewed_at": "2026-07-28", "reviewer": "Hasan Raza Kazmi"}
+    }
+  ]
+}
