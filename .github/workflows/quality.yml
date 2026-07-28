@@ -21,22 +21,20 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Validate JSON and local Markdown links
+      - name: Install validation dependencies
+        run: python -m pip install --disable-pip-version-check "jsonschema[format]>=4.23,<5"
+      - name: Run schema and domain-rule tests
+        run: python tests/validate_repository.py
+      - name: Validate local Markdown links
         shell: bash
         run: |
           python - <<'PY'
           from pathlib import Path
           from urllib.parse import unquote, urlsplit
-          import json, re, sys
+          import re, sys
 
           root = Path.cwd()
           errors = []
-          for path in root.rglob('*.json'):
-              try:
-                  json.loads(path.read_text(encoding='utf-8'))
-              except Exception as exc:
-                  errors.append(f'{path}: {exc}')
-
           pattern = re.compile(r'!?\[[^\]]*\]\(([^)]+)\)')
           for path in root.rglob('*.md'):
               for raw in pattern.findall(path.read_text(encoding='utf-8')):
@@ -47,9 +45,8 @@ jobs:
                   candidate = (root / clean.lstrip('/')) if clean.startswith('/') else (path.parent / clean)
                   if not candidate.exists():
                       errors.append(f'{path}: missing local target {target}')
-
           if errors:
               print('\n'.join(errors))
               sys.exit(1)
-          print('Sanitized repository validation passed.')
+          print('Local Markdown links passed.')
           PY
