@@ -18,7 +18,7 @@ A public-safe reference architecture for a source-first research product that di
 - 2 fictional source records
 - 1 executable domain-validation suite
 - 1 scheduled production smoke test
-- 2 automated GitHub workflows
+- 3 automated GitHub workflows
 
 These counts describe the public-safe reference package, not the production corpus.
 
