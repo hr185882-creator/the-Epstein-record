@@ -1,0 +1,59 @@
+name: Materialize semantic production page
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "scripts/materialize-production.mjs"
+      - ".github/workflows/materialize-production.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: semantic-production-materialization
+  cancel-in-progress: false
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Materialize the existing production page as semantic HTML
+        env:
+          SNAPSHOT_SOURCE_URL: https://the-epstein-record-72glq5ayh-hasan-kazmi-s-projects.vercel.app/
+        run: node scripts/materialize-production.mjs
+
+      - name: Validate direct-rendered output
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s public/index.html
+          grep -qi '<main' public/index.html
+          grep -qi 'The Epstein Record' public/index.html
+          ! grep -q 'DecompressionStream' public/index.html
+          ! grep -q 'document.write(' public/index.html
+          ! grep -q 'atob(' public/index.html
+          echo "Semantic production output passed."
+
+      - name: Commit generated production artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- public; then
+            echo "No production artifact changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/index.html public/robots.txt public/sitemap.xml
+          git commit -m "Materialize semantic production page"
+          git push
