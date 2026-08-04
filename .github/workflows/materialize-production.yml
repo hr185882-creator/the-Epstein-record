@@ -27,9 +27,9 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Materialize the existing production page as semantic HTML
+      - name: Materialize the production page as semantic HTML
         env:
-          SNAPSHOT_SOURCE_URL: https://the-epstein-record-72glq5ayh-hasan-kazmi-s-projects.vercel.app/
+          SNAPSHOT_SOURCE_URL: https://the-epstein-record.vercel.app/
         run: node scripts/materialize-production.mjs
 
       - name: Validate direct-rendered output
@@ -48,7 +48,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if git diff --quiet -- public; then
+          if test -z "$(git status --porcelain -- public)"; then
             echo "No production artifact changes."
             exit 0
           fi
