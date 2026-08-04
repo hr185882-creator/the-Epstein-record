@@ -10,12 +10,17 @@ if (!existsSync(source)) throw new Error('Missing public/index.html');
 let html = readFileSync(source, 'utf8');
 
 html = html
-  .replace(/<link\b[^>]*href=["']\/_next\/[^>]*>/gi, '')
+  // Remove framework-managed styles, preloads, scripts, and transport metadata.
+  .replace(/<link\b[^>]*\/_next\/[^>]*>/gi, '')
   .replace(/<link\b[^>]*rel=["'](?:preload|expect)["'][^>]*>/gi, '')
   .replace(/<script\b(?![^>]*type=["']application\/ld\+json["'])[^>]*>[\s\S]*?<\/script>/gi, '')
-  .replace(/<script\b[^>]*src=["']\/_next\/[^>]*><\/script>/gi, '')
   .replace(/\sdata-precedence=["'][^"']*["']/gi, '')
-  .replace(/\scrossorigin(?:=["'][^"']*["'])?/gi, '');
+  .replace(/\scrossorigin(?:=["'][^"']*["'])?/gi, '')
+  // Remove any residual raw Next.js asset URL from images, CSS, metadata, or
+  // serialized attributes. Empty attributes are harmless in the static build.
+  .replace(/\/_next\/[^"'\s<>)]+/gi, '')
+  // Remove escaped asset paths that can survive inside serialized text.
+  .replace(/\\\/_next\\\/[^"'\s<>)]+/gi, '');
 
 const baselineCss = `
 <style id="record-lock-static-baseline">
@@ -28,8 +33,12 @@ else html = `${baselineCss}${html}`;
 if (!/<!doctype html>/i.test(html)) throw new Error('Output is not HTML');
 if (!/<main\b/i.test(html)) throw new Error('Output has no main landmark');
 if (!/The Epstein Record/i.test(html)) throw new Error('Output identity check failed');
-if (/\/_next\//i.test(html)) throw new Error('Dead Next.js asset references remain');
-if (/DecompressionStream|document\.write\s*\(|\batob\s*\(/i.test(html)) throw new Error('Browser bootstrap code remains');
+if (/\/_next\//i.test(html) || /\\\/_next\\\//i.test(html)) {
+  throw new Error('Dead Next.js asset references remain');
+}
+if (/DecompressionStream|document\.write\s*\(|\batob\s*\(/i.test(html)) {
+  throw new Error('Browser bootstrap code remains');
+}
 
 rmSync(output, { recursive: true, force: true });
 mkdirSync(output, { recursive: true });
