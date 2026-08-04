@@ -28,6 +28,10 @@ The production product incorporates large public-record collections, reviewed re
 
 This is a reference implementation and documentation package, not a byte-for-byte copy of the production deployment.
 
+## Repository governance
+
+Changes to the production reference should be proposed through pull requests, pass the schema and domain-validation workflow, and be merged only after the deployment impact is reviewable.
+
 ## Demonstrated capabilities
 
 - Claim-level evidence classification
