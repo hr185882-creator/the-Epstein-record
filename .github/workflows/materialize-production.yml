@@ -1,59 +1,61 @@
-name: Materialize semantic production page
+name: Validate static production build
 
 on:
-  workflow_dispatch:
   push:
+    branches: [main]
     paths:
-      - "scripts/materialize-production.mjs"
+      - "public/**"
+      - "scripts/build-static.mjs"
+      - "package.json"
+      - "vercel.json"
       - ".github/workflows/materialize-production.yml"
+  pull_request:
+    paths:
+      - "public/**"
+      - "scripts/build-static.mjs"
+      - "package.json"
+      - "vercel.json"
+      - ".github/workflows/materialize-production.yml"
+  workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: semantic-production-materialization
-  cancel-in-progress: false
+  group: static-production-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  materialize:
+  build:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - name: Check out repository
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: "22"
 
-      - name: Materialize the production page as semantic HTML
-        env:
-          SNAPSHOT_SOURCE_URL: https://the-epstein-record.vercel.app/
-        run: node scripts/materialize-production.mjs
+      - name: Build self-contained static output
+        run: npm run build
 
-      - name: Validate direct-rendered output
+      - name: Validate production artifact
         shell: bash
         run: |
           set -euo pipefail
-          test -s public/index.html
-          grep -qi '<main' public/index.html
-          grep -qi 'The Epstein Record' public/index.html
-          ! grep -q 'DecompressionStream' public/index.html
-          ! grep -q 'document.write(' public/index.html
-          ! grep -q 'atob(' public/index.html
-          echo "Semantic production output passed."
-
-      - name: Commit generated production artifact
-        shell: bash
-        run: |
-          set -euo pipefail
-          if test -z "$(git status --porcelain -- public)"; then
-            echo "No production artifact changes."
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add public/index.html public/robots.txt public/sitemap.xml
-          git commit -m "Materialize semantic production page"
-          git push
+          test -s dist/index.html
+          grep -qi '<main' dist/index.html
+          grep -q 'data-product="the-epstein-record-public-reference"' dist/index.html
+          grep -q 'Evidence before narrative' dist/index.html
+          grep -q 'Fictional schema examples' dist/index.html
+          ! grep -qi 'Log in to Vercel' dist/index.html
+          ! grep -qi 'vercel.com/login' dist/index.html
+          ! grep -q '/_next/' dist/index.html
+          ! grep -q 'DecompressionStream' dist/index.html
+          ! grep -q 'document.write(' dist/index.html
+          ! grep -q 'atob(' dist/index.html
+          test -s dist/robots.txt
+          test -s dist/sitemap.xml
+          echo "Static production artifact passed all identity and integrity checks."
