@@ -8,6 +8,6 @@
     "test": "node scripts/build-static.mjs --check"
   },
   "engines": {
-    "node": ">=20"
+    "node": "22.x"
   }
 }
