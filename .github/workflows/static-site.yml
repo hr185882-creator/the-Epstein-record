@@ -1,0 +1,33 @@
+name: Static site validation
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: static-site-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Build self-contained static site
+        run: npm run build
+      - name: Reject dead Next.js and bootstrap references
+        run: |
+          set -euo pipefail
+          test -s dist/index.html
+          ! grep -Eiq '/_next/|DecompressionStream|document\.write\s*\(|\batob\s*\(' dist/index.html
+          grep -Eiq '<main\b' dist/index.html
+          grep -Fqi 'The Epstein Record' dist/index.html
