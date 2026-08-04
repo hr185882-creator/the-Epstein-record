@@ -1,0 +1,44 @@
+name: Static production quality
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: static-quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Build self-contained production output
+        run: npm run build
+
+      - name: Reject framework and browser-bootstrap dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s dist/index.html
+          grep -Fqi 'The Epstein Record' dist/index.html
+          grep -Fqi 'data-product="the-epstein-record-public-reference"' dist/index.html
+          if grep -Eqi '/_next/|DecompressionStream|document\.write[[:space:]]*\(|\batob[[:space:]]*\(' dist/index.html; then
+            echo 'Forbidden framework or browser-bootstrap dependency remains in dist/index.html'
+            exit 1
+          fi
+          test -s dist/robots.txt
+          test -s dist/sitemap.xml
