@@ -1,0 +1,13 @@
+{
+  "name": "the-epstein-record-static",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-static.mjs",
+    "test": "node scripts/build-static.mjs --check"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
