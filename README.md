@@ -19,7 +19,7 @@ A public-safe reference architecture for a source-first research product that di
 - 1 executable domain-validation suite
 - 1 deterministic static production build
 - 1 scheduled production smoke test
-- 3 automated GitHub workflows
+- 2 automated GitHub workflows
 
 These counts describe the public-safe reference package, not the production corpus.
 
@@ -54,7 +54,6 @@ Changes to the production reference should be proposed through pull requests and
 - `data/example-claim-ledger.json` — fictional public-safe schema examples
 - `.github/workflows/quality.yml` — required schema, domain, link, and static-build validation
 - `.github/workflows/live-smoke.yml` — scheduled production-endpoint verification
-- `.github/workflows/dependency-review.yml` — high-severity dependency review on pull requests when GitHub Dependency Graph is available
 - `SECURITY.md` — responsible disclosure and sensitive-data handling
 - `CHANGELOG.md` — material release history
 - `RELEASE_NOTES.md` — release-ready version notes
