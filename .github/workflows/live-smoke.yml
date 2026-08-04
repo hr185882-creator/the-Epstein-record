@@ -2,25 +2,61 @@ name: Live product smoke test
 
 on:
   schedule:
-    - cron: "17 6 * * *"
+    - cron: "17 */6 * * *"
   workflow_dispatch:
   push:
+    branches: [main]
     paths:
+      - "public/**"
+      - "scripts/build-static.mjs"
+      - "package.json"
+      - "vercel.json"
       - ".github/workflows/live-smoke.yml"
 
 permissions:
   contents: read
 
+concurrency:
+  group: live-product-smoke
+  cancel-in-progress: true
+
 jobs:
   smoke:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
-      - name: Verify production endpoint
+      - name: Verify production identity, integrity, and headers
         shell: bash
         run: |
           set -euo pipefail
-          body="$(curl --fail --silent --show-error --location --retry 3 --max-time 30 https://the-epstein-record.vercel.app/)"
-          test -n "$body"
-          grep -qi "The Epstein Record" <<<"$body"
-          echo "Production endpoint returned expected product identity."
+          base="https://the-epstein-record.vercel.app"
+
+          code="$(curl --silent --show-error --location --retry 3 --max-time 30 \
+            --dump-header /tmp/headers --output /tmp/body --write-out '%{http_code}' "$base/")"
+          test "$code" = "200" || { echo "Homepage returned HTTP $code"; exit 1; }
+          test -s /tmp/body
+
+          grep -q 'data-product="the-epstein-record-public-reference"' /tmp/body
+          grep -q 'Evidence before narrative' /tmp/body
+          grep -q 'Fictional schema examples' /tmp/body
+          grep -q 'Sanitized Public Reference' /tmp/body
+
+          ! grep -qi 'Log in to Vercel' /tmp/body
+          ! grep -qi 'vercel.com/login' /tmp/body
+          ! grep -q 'data-dpl-id=' /tmp/body
+          ! grep -q '/_next/' /tmp/body
+          ! grep -q 'DecompressionStream' /tmp/body
+          ! grep -q 'document.write(' /tmp/body
+          ! grep -q 'atob(' /tmp/body
+
+          grep -qi '^x-content-type-options: nosniff' /tmp/headers
+          grep -qi '^x-frame-options: DENY' /tmp/headers
+          grep -qi '^referrer-policy: strict-origin-when-cross-origin' /tmp/headers
+          grep -qi '^permissions-policy: camera=(), microphone=(), geolocation=()' /tmp/headers
+
+          curl --fail --silent --show-error --location --retry 3 --max-time 30 \
+            "$base/robots.txt" | grep -q 'User-agent: \*'
+          curl --fail --silent --show-error --location --retry 3 --max-time 30 \
+            "$base/sitemap.xml" | grep -q 'https://the-epstein-record.vercel.app/'
+
+          echo "Production endpoint passed identity, integrity, indexing, and security checks."
