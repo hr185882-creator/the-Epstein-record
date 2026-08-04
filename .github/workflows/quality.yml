@@ -1,7 +1,8 @@
-name: Quality checks
+name: Required quality gate
 
 on:
   push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
@@ -9,22 +10,52 @@ permissions:
   contents: read
 
 concurrency:
-  group: quality-${{ github.workflow }}-${{ github.ref }}
+  group: required-quality-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  validate:
+  repository-quality:
+    name: repository-quality
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: '3.12'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
       - name: Install validation dependencies
         run: python -m pip install --disable-pip-version-check "jsonschema[format]>=4.23,<5"
+
       - name: Run schema and domain-rule tests
         run: python tests/validate_repository.py
+
+      - name: Build self-contained public site
+        run: npm run build
+
+      - name: Validate built product identity and architecture
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s dist/index.html
+          test -s dist/robots.txt
+          test -s dist/sitemap.xml
+          grep -Fq 'data-product="the-epstein-record-public-reference"' dist/index.html
+          grep -Fq 'Evidence before narrative.' dist/index.html
+          if grep -Eqi 'Log in to Vercel|/_next/|DecompressionStream|document\.write[[:space:]]*\(|\batob[[:space:]]*\(' dist/index.html; then
+            echo 'Prohibited framework, authentication, or browser-bootstrap content detected.'
+            exit 1
+          fi
+
       - name: Validate local Markdown links
         shell: bash
         run: |

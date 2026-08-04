@@ -1,6 +1,6 @@
 # The Epstein Record — Sanitized Public Reference
 
-[![Quality checks](https://github.com/hr185882-creator/the-Epstein-record/actions/workflows/quality.yml/badge.svg)](https://github.com/hr185882-creator/the-Epstein-record/actions/workflows/quality.yml)
+[![Required quality gate](https://github.com/hr185882-creator/the-Epstein-record/actions/workflows/quality.yml/badge.svg)](https://github.com/hr185882-creator/the-Epstein-record/actions/workflows/quality.yml)
 [![Live product smoke test](https://github.com/hr185882-creator/the-Epstein-record/actions/workflows/live-smoke.yml/badge.svg)](https://github.com/hr185882-creator/the-Epstein-record/actions/workflows/live-smoke.yml)
 
 A public-safe reference architecture for a source-first research product that distinguishes what records establish from what they merely suggest, repeat, or fail to prove.
@@ -17,8 +17,9 @@ A public-safe reference architecture for a source-first research product that di
 - 2 fictional claim-ledger records
 - 2 fictional source records
 - 1 executable domain-validation suite
+- 1 deterministic static production build
 - 1 scheduled production smoke test
-- 3 automated GitHub workflows
+- 2 automated GitHub workflows
 
 These counts describe the public-safe reference package, not the production corpus.
 
@@ -30,7 +31,7 @@ This is a reference implementation and documentation package, not a byte-for-byt
 
 ## Repository governance
 
-Changes to the production reference should be proposed through pull requests, pass the schema and domain-validation workflow, and be merged only after the deployment impact is reviewable.
+Changes to the production reference should be proposed through pull requests and merged only after both `Required quality gate / repository-quality` and `Vercel` pass. The quality gate validates the schema, domain rules, Markdown links, self-contained static build, public product identity, and absence of framework or browser-bootstrap residue.
 
 ## Demonstrated capabilities
 
@@ -47,12 +48,12 @@ Changes to the production reference should be proposed through pull requests, pa
 
 - `schema/claim-ledger.schema.json` — machine-enforced public schema
 - `tests/validate_repository.py` — domain and publication-control tests
+- `scripts/build-static.mjs` — deterministic self-contained production build
 - `docs/ARCHITECTURE.md` — system boundaries, data flow, and release gates
 - `docs/PRIVACY_AND_CORRECTIONS.md` — privacy, corrections, and contested-claim controls
 - `data/example-claim-ledger.json` — fictional public-safe schema examples
-- `.github/workflows/quality.yml` — schema, domain, and link validation
+- `.github/workflows/quality.yml` — required schema, domain, link, and static-build validation
 - `.github/workflows/live-smoke.yml` — scheduled production-endpoint verification
-- `.github/workflows/dependency-review.yml` — high-severity dependency review on pull requests
 - `SECURITY.md` — responsible disclosure and sensitive-data handling
 - `CHANGELOG.md` — material release history
 - `RELEASE_NOTES.md` — release-ready version notes
